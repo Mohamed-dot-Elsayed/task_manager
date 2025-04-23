@@ -11,21 +11,35 @@ const getTaskById = asyncWrap(async (req, res, next) => {
   const { id: taskID } = req.params;
   const task = await Task.findOne({ _id: taskID });
   if (!task) {
-    return next(createCustomError(`No task with id: ${taskID}`), 404);
+    return next(createCustomError(`No task with id: ${taskID}`, 404));
   }
   res.status(200).json({ task });
 });
 
-const updateTask = (req, res) => {
-  res.json(req.params.id);
-};
+const updateTask = asyncWrap(async (req, res, next) => {
+  const { id: taskID } = req.params;
+  const task = await Task.findOneAndUpdate({ _id: taskID }, req.body, {
+    new: true,
+    runValidators: true,
+  });
+  if (!task) {
+    return next(createCustomError(`No task with id: ${taskID}`, 404));
+  }
+  res.status(200).json({ task });
+});
 
-const deleteTask = (req, res) => {
-  res.json(req.params.id);
-};
+const deleteTask = asyncWrap(async (req, res, next) => {
+  const { id: taskID } = req.params;
+  const task = await Task.findOneAndDelete({ _id: taskID });
+  if (!task) {
+    return next(createCustomError(`No task with id: ${taskID}`, 404));
+  }
+  res.status(200).json({ task });
+});
 
 const createTask = asyncWrap(async (req, res) => {
   const task = await Task.create(req.body);
+  console.log("nny");
   res.status(200).json({ task });
 });
 
